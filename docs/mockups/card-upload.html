@@ -1,0 +1,461 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Card Upload - TCG Card Management System</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #0a1a1f;
+            min-height: 100vh;
+        }
+
+        .header {
+            background-color: #0f2329;
+            color: white;
+            padding: 1rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #2a4f5f;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .nav-links a {
+            color: white;
+            text-decoration: none;
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            transition: background-color 0.3s;
+        }
+
+        .nav-links a:hover {
+            background-color: #1a2d35;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .page-title {
+            margin-bottom: 2rem;
+            color: #ffffff;
+        }
+
+        .upload-layout {
+            display: grid;
+            grid-template-columns: 1fr 300px;
+            gap: 2rem;
+        }
+
+        .upload-section {
+            background: #1a2d35;
+            padding: 2rem;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+            border: 1px solid #2a4f5f;
+        }
+
+        .upload-info {
+            background: #1a2d35;
+            padding: 1.5rem;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+            height: fit-content;
+            border: 1px solid #2a4f5f;
+        }
+
+        .section-title {
+            color: #ffffff;
+            margin-bottom: 1.5rem;
+            border-bottom: 2px solid #00d4ff;
+            padding-bottom: 0.5rem;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: #ffffff;
+            font-weight: bold;
+        }
+
+        .form-group select {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid #2a4f5f;
+            border-radius: 4px;
+            font-size: 1rem;
+            background-color: #0f2329;
+            color: #ffffff;
+        }
+
+        .form-group select:focus {
+            outline: none;
+            border-color: #00d4ff;
+        }
+
+        .upload-zone {
+            border: 3px dashed #00d4ff;
+            border-radius: 8px;
+            padding: 3rem;
+            text-align: center;
+            background-color: #0f2329;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .upload-zone:hover {
+            background-color: #1a2d35;
+            border-color: #00b8e6;
+        }
+
+        .upload-zone.dragover {
+            background-color: #1a2d35;
+            border-color: #00b8e6;
+        }
+
+        .upload-zone input {
+            display: none;
+        }
+
+        .upload-icon {
+            font-size: 3rem;
+            color: #00d4ff;
+            margin-bottom: 1rem;
+        }
+
+        .upload-text {
+            color: #b0b0b0;
+            font-size: 1.1rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .upload-subtext {
+            color: #888;
+            font-size: 0.9rem;
+        }
+
+        .file-list {
+            margin-top: 2rem;
+        }
+
+        .file-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem;
+            border: 1px solid #2a4f5f;
+            border-radius: 4px;
+            margin-bottom: 0.5rem;
+            background-color: #0f2329;
+        }
+
+        .file-info {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .file-thumbnail {
+            width: 40px;
+            height: 40px;
+            background-color: #2a4f5f;
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.8rem;
+            color: #b0b0b0;
+        }
+
+        .file-details {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .file-name {
+            font-weight: bold;
+            color: #ffffff;
+        }
+
+        .file-size {
+            font-size: 0.9rem;
+            color: #b0b0b0;
+        }
+
+        .file-actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .btn {
+            padding: 0.5rem 1rem;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: background-color 0.3s;
+        }
+
+        .btn-primary {
+            background-color: #00d4ff;
+            color: #0a1a1f;
+            font-weight: bold;
+        }
+
+        .btn-primary:hover {
+            background-color: #00b8e6;
+        }
+
+        .btn-success {
+            background-color: #28a745;
+            color: white;
+        }
+
+        .btn-success:hover {
+            background-color: #218838;
+        }
+
+        .btn-danger {
+            background-color: #dc3545;
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background-color: #c82333;
+        }
+
+        .btn-large {
+            padding: 1rem 2rem;
+            font-size: 1.1rem;
+            margin-top: 2rem;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 6px;
+            background-color: #e9ecef;
+            border-radius: 3px;
+            overflow: hidden;
+            margin-top: 0.5rem;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background-color: #28a745;
+            transition: width 0.3s ease;
+        }
+
+        .upload-stats {
+            background-color: #0f2329;
+            padding: 1rem;
+            border-radius: 4px;
+            margin-bottom: 1rem;
+            border: 1px solid #2a4f5f;
+        }
+
+        .stat-item {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 0.5rem;
+            color: #b0b0b0;
+        }
+
+        .stat-item:last-child {
+            margin-bottom: 0;
+        }
+
+        .wireframe-note {
+            margin-top: 2rem;
+            padding: 1rem;
+            background-color: #0f2329;
+            border: 1px solid #2a4f5f;
+            border-radius: 4px;
+            font-size: 0.9rem;
+            color: #b0b0b0;
+        }
+
+        @media (max-width: 768px) {
+            .upload-layout {
+                grid-template-columns: 1fr;
+            }
+            
+            .file-item {
+                flex-direction: column;
+                align-items: stretch;
+                gap: 1rem;
+            }
+            
+            .file-info {
+                justify-content: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>Card Upload</h1>
+        <div class="nav-links">
+            <a href="card-management.html">Card Management</a>
+            <a href="game-manager.html">Game Manager</a>
+            <a href="deckbuilder.html">Deckbuilder</a>
+        </div>
+    </div>
+
+    <div class="container">
+        <h1 class="page-title">Upload Cards</h1>
+        
+        <div class="upload-layout">
+            <div class="upload-section">
+                <h2 class="section-title">Upload Card Images</h2>
+                
+                <div class="form-group">
+                    <label for="card-set">Designate Set</label>
+                    <select id="card-set">
+                        <option value="">Select a set...</option>
+                        <option value="core-set">Core Set 2024</option>
+                        <option value="expansion-1">Expansion Pack 1</option>
+                        <option value="promo">Promo Cards</option>
+                    </select>
+                </div>
+                
+                <div class="upload-zone" id="uploadZone">
+                    <input type="file" id="fileInput" multiple accept="image/*">
+                    <div class="upload-icon">📁</div>
+                    <div class="upload-text">Drag & drop card images here</div>
+                    <div class="upload-subtext">or click to browse files</div>
+                    <div class="upload-subtext">Supports JPG, PNG, GIF files</div>
+                </div>
+                
+                <div class="file-list" id="fileList">
+                    <div class="file-item">
+                        <div class="file-info">
+                            <div class="file-thumbnail">IMG</div>
+                            <div class="file-details">
+                                <div class="file-name">lightning-bolt.jpg</div>
+                                <div class="file-size">2.3 MB</div>
+                            </div>
+                        </div>
+                        <div class="file-actions">
+                            <button class="btn btn-danger">Remove</button>
+                        </div>
+                    </div>
+                    
+                    <div class="file-item">
+                        <div class="file-info">
+                            <div class="file-thumbnail">IMG</div>
+                            <div class="file-details">
+                                <div class="file-name">fire-dragon.png</div>
+                                <div class="file-size">1.8 MB</div>
+                            </div>
+                        </div>
+                        <div class="file-actions">
+                            <button class="btn btn-danger">Remove</button>
+                        </div>
+                    </div>
+                    
+                    <div class="file-item">
+                        <div class="file-info">
+                            <div class="file-thumbnail">IMG</div>
+                            <div class="file-details">
+                                <div class="file-name">healing-potion.jpg</div>
+                                <div class="file-size">1.5 MB</div>
+                            </div>
+                        </div>
+                        <div class="file-actions">
+                            <button class="btn btn-danger">Remove</button>
+                        </div>
+                    </div>
+                </div>
+                
+                <button class="btn btn-success btn-large" id="uploadButton">
+                    Upload Cards
+                </button>
+            </div>
+            
+            <div class="upload-info">
+                <h3 style="color: #ffffff;">Upload Information</h3>
+                
+                <div class="upload-stats">
+                    <div class="stat-item">
+                        <span>Files Selected:</span>
+                        <strong>3</strong>
+                    </div>
+                    <div class="stat-item">
+                        <span>Total Size:</span>
+                        <strong>5.6 MB</strong>
+                    </div>
+                    <div class="stat-item">
+                        <span>Selected Set:</span>
+                        <strong>Core Set 2024</strong>
+                    </div>
+                </div>
+                
+                <div style="margin-top: 2rem;">
+                    <h4 style="color: #ffffff;">Upload Guidelines:</h4>
+                    <ul style="margin-top: 0.5rem; padding-left: 1.5rem; color: #b0b0b0;">
+                        <li>Maximum file size: 10MB</li>
+                        <li>Supported formats: JPG, PNG, GIF</li>
+                        <li>Recommended resolution: 300x420px</li>
+                        <li>Select a set before uploading</li>
+                    </ul>
+                </div>
+                
+                <div style="margin-top: 2rem;">
+                    <h4 style="color: #ffffff;">Next Steps:</h4>
+                    <ul style="margin-top: 0.5rem; padding-left: 1.5rem; color: #b0b0b0;">
+                        <li>Upload images to the selected set</li>
+                        <li>Review in Card Management</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="wireframe-note">
+            <strong>Wireframe Note:</strong> This page provides a drag-and-drop interface for uploading card images. Users must select a set before uploading. The uploaded cards will be processed and made available in the Card Management system.
+        </div>
+    </div>
+
+    <script>
+        // Basic drag and drop functionality for wireframe demonstration
+        const uploadZone = document.getElementById('uploadZone');
+        const fileInput = document.getElementById('fileInput');
+        
+        uploadZone.addEventListener('click', () => {
+            fileInput.click();
+        });
+        
+        uploadZone.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            uploadZone.classList.add('dragover');
+        });
+        
+        uploadZone.addEventListener('dragleave', () => {
+            uploadZone.classList.remove('dragover');
+        });
+        
+        uploadZone.addEventListener('drop', (e) => {
+            e.preventDefault();
+            uploadZone.classList.remove('dragover');
+            // Handle dropped files here
+        });
+    </script>
+</body>
+</html>

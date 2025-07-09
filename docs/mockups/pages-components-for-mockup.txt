@@ -1,0 +1,35 @@
+PAGES/COMPONENTS:
+Creator Login
+Game Manager
+Card Management
+Card Upload
+Deckbuilder
+
+Creator Login
+Username and Password fields
+Submission takes you to Card Management
+
+Game Manager
+Edit sets
+For each set, an input field for "Card Data" google sheet url
+"Save" button
+Links to Card Management, Deckbuilder
+
+Card Management
+View all cards in a list
+Toggle show/hide cards
+Link to Card Upload
+Link to Deckbuilder
+Link to Game Manager
+
+Card Upload
+Upload Cards element
+Designate set dropdown
+
+Deckbuilder
+50 card grid with pagination
+Filters for set, type, element, class
+Search by card name
+Deckbuilder side bar
+Export to text
+Export to TTS

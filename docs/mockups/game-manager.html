@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Game Manager - TCG Card Management System</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #0a1a1f;
+            min-height: 100vh;
+        }
+
+        .header {
+            background-color: #0f2329;
+            color: white;
+            padding: 1rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #2a4f5f;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .nav-links a {
+            color: white;
+            text-decoration: none;
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            transition: background-color 0.3s;
+        }
+
+        .nav-links a:hover {
+            background-color: #1a2d35;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .page-title {
+            margin-bottom: 2rem;
+            color: #ffffff;
+        }
+
+        .sets-management {
+            display: flex;
+            flex-direction: column;
+            gap: 2rem;
+        }
+
+        .management-section {
+            background: #1a2d35;
+            padding: 1.5rem;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+            border: 1px solid #2a4f5f;
+        }
+
+        .management-section h2 {
+            color: #ffffff;
+            margin-bottom: 1rem;
+            border-bottom: 2px solid #00d4ff;
+            padding-bottom: 0.5rem;
+        }
+
+        .section-content {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .item-list {
+            max-height: 200px;
+            overflow-y: auto;
+            border: 1px solid #2a4f5f;
+            border-radius: 4px;
+            padding: 0.5rem;
+            background-color: #0f2329;
+        }
+
+        .item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.5rem;
+            border-bottom: 1px solid #2a4f5f;
+            color: #ffffff;
+        }
+
+        .item:last-child {
+            border-bottom: none;
+        }
+
+        .item-actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .btn {
+            padding: 0.5rem 1rem;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: background-color 0.3s;
+        }
+
+        .btn-primary {
+            background-color: #00d4ff;
+            color: #0a1a1f;
+            font-weight: bold;
+        }
+
+        .btn-primary:hover {
+            background-color: #00b8e6;
+        }
+
+        .btn-secondary {
+            background-color: #2a4f5f;
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background-color: #1a3d4a;
+        }
+
+        .btn-danger {
+            background-color: #dc3545;
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background-color: #c82333;
+        }
+
+        .add-form {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .add-form input {
+            flex: 1;
+            padding: 0.5rem;
+            border: 1px solid #2a4f5f;
+            border-radius: 4px;
+            background-color: #0f2329;
+            color: #ffffff;
+        }
+
+        .field-config {
+            background-color: #0f2329;
+            padding: 1rem;
+            border-radius: 4px;
+            margin-top: 1rem;
+            border: 1px solid #2a4f5f;
+        }
+
+        .sets-list {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        .set-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 1rem;
+            padding: 1rem;
+            background-color: #0f2329;
+            border: 1px solid #2a4f5f;
+            border-radius: 4px;
+        }
+
+        .set-info {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .set-name {
+            font-size: 1.1rem;
+            font-weight: bold;
+            color: #ffffff;
+        }
+
+        .set-url-container {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .set-url-container label {
+            font-size: 0.9rem;
+            color: #b0b0b0;
+            font-weight: normal;
+        }
+
+        .set-url-container input {
+            padding: 0.5rem;
+            border: 1px solid #2a4f5f;
+            border-radius: 4px;
+            background-color: #1a2d35;
+            color: #ffffff;
+            font-size: 0.9rem;
+        }
+
+        .set-url-container input:focus {
+            outline: none;
+            border-color: #00d4ff;
+        }
+
+        .set-actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .save-section {
+            display: flex;
+            justify-content: center;
+            padding: 1rem;
+        }
+
+        .save-button {
+            padding: 1rem 2rem;
+            font-size: 1.1rem;
+        }
+
+        .wireframe-note {
+            margin-top: 2rem;
+            padding: 1rem;
+            background-color: #0f2329;
+            border: 1px solid #2a4f5f;
+            border-radius: 4px;
+            font-size: 0.9rem;
+            color: #b0b0b0;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>Game Manager</h1>
+        <div class="nav-links">
+            <a href="card-management.html">Card Management</a>
+            <a href="deckbuilder.html">Deckbuilder</a>
+        </div>
+    </div>
+
+    <div class="container">
+        <h1 class="page-title">Game Manager</h1>
+        
+        <div class="sets-management">
+            <div class="management-section">
+                <h2>Edit Sets</h2>
+                <div class="section-content">
+                    <div class="add-form">
+                        <input type="text" placeholder="New set name..." />
+                        <button class="btn btn-primary">Add Set</button>
+                    </div>
+                    <div class="sets-list">
+                        <div class="set-item">
+                            <div class="set-info">
+                                <div class="set-name">Core Set 2024</div>
+                                <div class="set-url-container">
+                                    <label for="core-set-url">Card Data Google Sheet URL:</label>
+                                    <input type="url" id="core-set-url" placeholder="https://docs.google.com/spreadsheets/..." />
+                                </div>
+                            </div>
+                            <div class="set-actions">
+                                <button class="btn btn-danger">Delete</button>
+                            </div>
+                        </div>
+                        
+                        <div class="set-item">
+                            <div class="set-info">
+                                <div class="set-name">Expansion Pack 1</div>
+                                <div class="set-url-container">
+                                    <label for="expansion-url">Card Data Google Sheet URL:</label>
+                                    <input type="url" id="expansion-url" placeholder="https://docs.google.com/spreadsheets/..." />
+                                </div>
+                            </div>
+                            <div class="set-actions">
+                                <button class="btn btn-danger">Delete</button>
+                            </div>
+                        </div>
+                        
+                        <div class="set-item">
+                            <div class="set-info">
+                                <div class="set-name">Promo Cards</div>
+                                <div class="set-url-container">
+                                    <label for="promo-url">Card Data Google Sheet URL:</label>
+                                    <input type="url" id="promo-url" placeholder="https://docs.google.com/spreadsheets/..." />
+                                </div>
+                            </div>
+                            <div class="set-actions">
+                                <button class="btn btn-danger">Delete</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="save-section">
+                <button class="btn btn-primary save-button">Save</button>
+            </div>
+        </div>
+
+        <div class="wireframe-note">
+            <strong>Wireframe Note:</strong> This page manages game sets and their associated Google Sheets URLs for card data. Each set has an input field for its Card Data Google Sheet URL. The Save button saves all set configurations. Links to Card Management and Deckbuilder are provided in the header navigation.
+        </div>
+    </div>
+</body>
+</html>

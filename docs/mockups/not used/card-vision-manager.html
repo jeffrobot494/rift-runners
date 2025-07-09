@@ -1,0 +1,551 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Card Vision Manager - TCG Card Management System</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #0a1a1f;
+            min-height: 100vh;
+        }
+
+        .header {
+            background-color: #0f2329;
+            color: white;
+            padding: 1rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #2a4f5f;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .nav-links a {
+            color: white;
+            text-decoration: none;
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            transition: background-color 0.3s;
+        }
+
+        .nav-links a:hover {
+            background-color: #1a2d35;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .page-title {
+            margin-bottom: 2rem;
+            color: #ffffff;
+        }
+
+        .vision-layout {
+            display: grid;
+            grid-template-columns: 300px 1fr;
+            gap: 2rem;
+        }
+
+        .control-panel {
+            background: #1a2d35;
+            padding: 1.5rem;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+            height: fit-content;
+            border: 1px solid #2a4f5f;
+        }
+
+        .vision-workspace {
+            background: #1a2d35;
+            padding: 2rem;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+            border: 1px solid #2a4f5f;
+        }
+
+        .section-title {
+            color: #ffffff;
+            margin-bottom: 1rem;
+            border-bottom: 2px solid #00d4ff;
+            padding-bottom: 0.5rem;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: #ffffff;
+            font-weight: bold;
+        }
+
+        .form-group select,
+        .form-group input {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid #2a4f5f;
+            border-radius: 4px;
+            font-size: 1rem;
+            background-color: #0f2329;
+            color: #ffffff;
+        }
+
+        .form-group select:focus,
+        .form-group input:focus {
+            outline: none;
+            border-color: #00d4ff;
+        }
+
+        .upload-zone {
+            border: 3px dashed #00d4ff;
+            border-radius: 8px;
+            padding: 2rem;
+            text-align: center;
+            background-color: #0f2329;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            margin-bottom: 1.5rem;
+        }
+
+        .upload-zone:hover {
+            background-color: #1a2d35;
+            border-color: #00b8e6;
+        }
+
+        .upload-zone input {
+            display: none;
+        }
+
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: background-color 0.3s;
+            width: 100%;
+            margin-bottom: 1rem;
+        }
+
+        .btn-primary {
+            background-color: #00d4ff;
+            color: #0a1a1f;
+            font-weight: bold;
+        }
+
+        .btn-primary:hover {
+            background-color: #00b8e6;
+        }
+
+        .btn-success {
+            background-color: #28a745;
+            color: white;
+        }
+
+        .btn-success:hover {
+            background-color: #218838;
+        }
+
+        .btn-warning {
+            background-color: #ffc107;
+            color: #212529;
+        }
+
+        .btn-warning:hover {
+            background-color: #e0a800;
+        }
+
+        .workspace-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+        }
+
+        .card-preview {
+            position: relative;
+        }
+
+        .card-image {
+            width: 100%;
+            max-width: 300px;
+            border: 2px solid #2a4f5f;
+            border-radius: 8px;
+            position: relative;
+        }
+
+        .text-overlay {
+            position: absolute;
+            border: 2px solid #00d4ff;
+            background-color: rgba(0, 212, 255, 0.1);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.8rem;
+            color: #00d4ff;
+            font-weight: bold;
+        }
+
+        .text-overlay:hover {
+            background-color: rgba(0, 212, 255, 0.2);
+        }
+
+        .text-overlay.selected {
+            border-color: #28a745;
+            background-color: rgba(40, 167, 69, 0.1);
+            color: #28a745;
+        }
+
+        .field-mapping {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .mapping-item {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 1rem;
+            border: 1px solid #2a4f5f;
+            border-radius: 4px;
+            background-color: #0f2329;
+        }
+
+        .mapping-item.mapped {
+            background-color: #0d2d3a;
+            border-color: #1a4d5c;
+        }
+
+        .detected-text {
+            flex: 1;
+            padding: 0.5rem;
+            background-color: #2a4f5f;
+            border: 1px solid #3a5f6f;
+            border-radius: 4px;
+            font-family: monospace;
+            font-size: 0.9rem;
+            color: #ffffff;
+        }
+
+        .field-selector {
+            min-width: 150px;
+        }
+
+        .field-selector select {
+            width: 100%;
+            padding: 0.5rem;
+            border: 1px solid #2a4f5f;
+            border-radius: 4px;
+            background-color: #0f2329;
+            color: #ffffff;
+        }
+
+        .progress-status {
+            background-color: #0f2329;
+            padding: 1rem;
+            border-radius: 4px;
+            margin-bottom: 1rem;
+            border-left: 4px solid #00d4ff;
+        }
+
+        .status-item {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 0.5rem;
+        }
+
+        .status-item:last-child {
+            margin-bottom: 0;
+        }
+
+        .status-badge {
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            font-weight: bold;
+        }
+
+        .status-pending {
+            background-color: #fff3cd;
+            color: #856404;
+        }
+
+        .status-processing {
+            background-color: #cce5ff;
+            color: #004085;
+        }
+
+        .status-complete {
+            background-color: #d4edda;
+            color: #155724;
+        }
+
+        .wireframe-note {
+            margin-top: 2rem;
+            padding: 1rem;
+            background-color: #0f2329;
+            border: 1px solid #2a4f5f;
+            border-radius: 4px;
+            font-size: 0.9rem;
+            color: #b0b0b0;
+        }
+
+        @media (max-width: 1024px) {
+            .vision-layout {
+                grid-template-columns: 1fr;
+            }
+            
+            .workspace-content {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>Card Vision Manager</h1>
+        <div class="nav-links">
+            <a href="card-management.html">Card Management</a>
+            <a href="card-upload.html">Card Upload</a>
+        </div>
+    </div>
+
+    <div class="container">
+        <h1 class="page-title">Google Vision Card Text Extraction</h1>
+        
+        <div class="vision-layout">
+            <div class="control-panel">
+                <h2 class="section-title">Configuration</h2>
+                
+                <div class="form-group">
+                    <label for="card-type">Card Type Selector</label>
+                    <select id="card-type">
+                        <option value="">Select card type...</option>
+                        <option value="creature">Creature</option>
+                        <option value="spell">Spell</option>
+                        <option value="artifact">Artifact</option>
+                        <option value="land">Land</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label>Upload Example Card</label>
+                    <div class="upload-zone">
+                        <input type="file" id="example-card" accept="image/*">
+                        <div>Click to upload<br>example card image</div>
+                    </div>
+                </div>
+                
+                <button class="btn btn-primary" id="run-vision">
+                    Run Google Vision
+                </button>
+                
+                <div class="progress-status">
+                    <div class="status-item">
+                        <span>Vision API Status:</span>
+                        <span class="status-badge status-complete">Complete</span>
+                    </div>
+                    <div class="status-item">
+                        <span>Text Areas Detected:</span>
+                        <strong>6</strong>
+                    </div>
+                    <div class="status-item">
+                        <span>Fields Mapped:</span>
+                        <strong>4 / 6</strong>
+                    </div>
+                </div>
+                
+                <button class="btn btn-success" id="save-mapping">
+                    Save Field Mapping
+                </button>
+                
+                <button class="btn btn-warning" id="reset-mapping">
+                    Reset Mapping
+                </button>
+            </div>
+            
+            <div class="vision-workspace">
+                <h2 class="section-title">Text Area Mapping</h2>
+                
+                <div class="workspace-content">
+                    <div class="card-preview">
+                        <h3 style="color: #ffffff;">Card Image with Detected Text Areas</h3>
+                        <div style="position: relative; display: inline-block;">
+                            <img src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzAwIiBoZWlnaHQ9IjQyMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KICA8cmVjdCB3aWR0aD0iMzAwIiBoZWlnaHQ9IjQyMCIgZmlsbD0iIzY2N2VlYSIvPgogIDx0ZXh0IHg9IjE1MCIgeT0iMjEwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSJ3aGl0ZSIgZm9udC1zaXplPSIxNiI+Q2FyZCBJbWFnZTwvdGV4dD4KPC9zdmc+" class="card-image" alt="Example card">
+                            
+                            <!-- Simulated text detection overlays -->
+                            <div class="text-overlay selected" style="top: 10px; left: 10px; width: 280px; height: 30px;">
+                                1
+                            </div>
+                            <div class="text-overlay" style="top: 50px; right: 10px; width: 40px; height: 25px;">
+                                2
+                            </div>
+                            <div class="text-overlay" style="top: 120px; left: 10px; width: 280px; height: 80px;">
+                                3
+                            </div>
+                            <div class="text-overlay" style="top: 220px; left: 10px; width: 280px; height: 60px;">
+                                4
+                            </div>
+                            <div class="text-overlay" style="bottom: 40px; left: 10px; width: 60px; height: 25px;">
+                                5
+                            </div>
+                            <div class="text-overlay" style="bottom: 40px; right: 10px; width: 60px; height: 25px;">
+                                6
+                            </div>
+                        </div>
+                        
+                        <p style="margin-top: 1rem; color: #b0b0b0; font-size: 0.9rem;">
+                            Click on numbered areas to select and map them to card fields below.
+                        </p>
+                    </div>
+                    
+                    <div class="field-mapping">
+                        <h3 style="color: #ffffff;">Associate Vision Text with Card Fields</h3>
+                        
+                        <div class="mapping-item mapped">
+                            <div class="detected-text">Lightning Bolt</div>
+                            <div class="field-selector">
+                                <select>
+                                    <option value="">Select field...</option>
+                                    <option value="name" selected>Name</option>
+                                    <option value="cost">Mana Cost</option>
+                                    <option value="type">Type</option>
+                                    <option value="text">Card Text</option>
+                                    <option value="flavor">Flavor Text</option>
+                                    <option value="attack">Attack</option>
+                                    <option value="defense">Defense</option>
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <div class="mapping-item mapped">
+                            <div class="detected-text">1</div>
+                            <div class="field-selector">
+                                <select>
+                                    <option value="">Select field...</option>
+                                    <option value="name">Name</option>
+                                    <option value="cost" selected>Mana Cost</option>
+                                    <option value="type">Type</option>
+                                    <option value="text">Card Text</option>
+                                    <option value="flavor">Flavor Text</option>
+                                    <option value="attack">Attack</option>
+                                    <option value="defense">Defense</option>
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <div class="mapping-item mapped">
+                            <div class="detected-text">Deal 3 damage to any target.</div>
+                            <div class="field-selector">
+                                <select>
+                                    <option value="">Select field...</option>
+                                    <option value="name">Name</option>
+                                    <option value="cost">Mana Cost</option>
+                                    <option value="type">Type</option>
+                                    <option value="text" selected>Card Text</option>
+                                    <option value="flavor">Flavor Text</option>
+                                    <option value="attack">Attack</option>
+                                    <option value="defense">Defense</option>
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <div class="mapping-item mapped">
+                            <div class="detected-text">The spark that ignites the storm.</div>
+                            <div class="field-selector">
+                                <select>
+                                    <option value="">Select field...</option>
+                                    <option value="name">Name</option>
+                                    <option value="cost">Mana Cost</option>
+                                    <option value="type">Type</option>
+                                    <option value="text">Card Text</option>
+                                    <option value="flavor" selected>Flavor Text</option>
+                                    <option value="attack">Attack</option>
+                                    <option value="defense">Defense</option>
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <div class="mapping-item">
+                            <div class="detected-text">Spell</div>
+                            <div class="field-selector">
+                                <select>
+                                    <option value="">Select field...</option>
+                                    <option value="name">Name</option>
+                                    <option value="cost">Mana Cost</option>
+                                    <option value="type">Type</option>
+                                    <option value="text">Card Text</option>
+                                    <option value="flavor">Flavor Text</option>
+                                    <option value="attack">Attack</option>
+                                    <option value="defense">Defense</option>
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <div class="mapping-item">
+                            <div class="detected-text">Common</div>
+                            <div class="field-selector">
+                                <select>
+                                    <option value="">Select field...</option>
+                                    <option value="name">Name</option>
+                                    <option value="cost">Mana Cost</option>
+                                    <option value="type">Type</option>
+                                    <option value="text">Card Text</option>
+                                    <option value="flavor">Flavor Text</option>
+                                    <option value="attack">Attack</option>
+                                    <option value="defense">Defense</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="wireframe-note">
+            <strong>Wireframe Note:</strong> This page allows users to upload example cards and use Google Vision API to automatically detect text areas. Users can then associate each detected text area with specific card data fields. This mapping can be saved and reused for similar card types. The process streamlines card data entry by automatically extracting text from card images.
+        </div>
+    </div>
+
+    <script>
+        // Basic interaction for wireframe demonstration
+        document.addEventListener('DOMContentLoaded', function() {
+            const textOverlays = document.querySelectorAll('.text-overlay');
+            const mappingItems = document.querySelectorAll('.mapping-item');
+            
+            textOverlays.forEach((overlay, index) => {
+                overlay.addEventListener('click', function() {
+                    // Remove selection from all overlays
+                    textOverlays.forEach(o => o.classList.remove('selected'));
+                    // Add selection to clicked overlay
+                    this.classList.add('selected');
+                    
+                    // Highlight corresponding mapping item
+                    mappingItems.forEach(item => item.style.backgroundColor = '#0f2329');
+                    if (mappingItems[index]) {
+                        mappingItems[index].style.backgroundColor = '#1a2d35';
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,539 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Card Data Editor - TCG Card Management System</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #0a1a1f;
+            min-height: 100vh;
+        }
+
+        .header {
+            background-color: #0f2329;
+            color: white;
+            padding: 1rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #2a4f5f;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .nav-links a {
+            color: white;
+            text-decoration: none;
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            transition: background-color 0.3s;
+        }
+
+        .nav-links a:hover {
+            background-color: #1a2d35;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .page-title {
+            margin-bottom: 1rem;
+            color: #ffffff;
+        }
+
+        .card-navigation {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            padding: 1rem;
+            background: #1a2d35;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+            border: 1px solid #2a4f5f;
+        }
+
+        .nav-button {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: background-color 0.3s;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .nav-button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .nav-button-prev {
+            background-color: #2a4f5f;
+            color: white;
+        }
+
+        .nav-button-prev:hover:not(:disabled) {
+            background-color: #1a3d4a;
+        }
+
+        .nav-button-next {
+            background-color: #00d4ff;
+            color: #0a1a1f;
+            font-weight: bold;
+        }
+
+        .nav-button-next:hover:not(:disabled) {
+            background-color: #00b8e6;
+        }
+
+        .card-info {
+            text-align: center;
+            color: #b0b0b0;
+        }
+
+        .card-counter {
+            font-size: 1.1rem;
+            font-weight: bold;
+            color: #ffffff;
+            margin-bottom: 0.5rem;
+        }
+
+        .card-set-info {
+            font-size: 0.9rem;
+        }
+
+        .editor-layout {
+            display: grid;
+            grid-template-columns: 1fr 300px;
+            gap: 2rem;
+        }
+
+        .editor-form {
+            background: #1a2d35;
+            padding: 2rem;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+            border: 1px solid #2a4f5f;
+        }
+
+        .card-preview {
+            background: #1a2d35;
+            padding: 1.5rem;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+            position: sticky;
+            top: 2rem;
+            height: fit-content;
+            border: 1px solid #2a4f5f;
+        }
+
+        .form-section {
+            margin-bottom: 2rem;
+        }
+
+        .form-section h3 {
+            color: #ffffff;
+            margin-bottom: 1rem;
+            border-bottom: 2px solid #00d4ff;
+            padding-bottom: 0.5rem;
+        }
+
+        .form-group {
+            margin-bottom: 1rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: #ffffff;
+            font-weight: bold;
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid #2a4f5f;
+            border-radius: 4px;
+            font-size: 1rem;
+            background-color: #0f2329;
+            color: #ffffff;
+        }
+
+        .form-group textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #00d4ff;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+        }
+
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: background-color 0.3s;
+            text-decoration: none;
+            display: inline-block;
+            margin-right: 1rem;
+        }
+
+        .btn-primary {
+            background-color: #00d4ff;
+            color: #0a1a1f;
+            font-weight: bold;
+        }
+
+        .btn-primary:hover {
+            background-color: #00b8e6;
+        }
+
+        .btn-secondary {
+            background-color: #2a4f5f;
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background-color: #1a3d4a;
+        }
+
+        .btn-success {
+            background-color: #28a745;
+            color: white;
+        }
+
+        .btn-success:hover {
+            background-color: #218838;
+        }
+
+        .preview-card {
+            border: 2px solid #2a4f5f;
+            border-radius: 8px;
+            padding: 1rem;
+            background: linear-gradient(135deg, #00d4ff 0%, #0a7a99 100%);
+            color: white;
+            margin-bottom: 1rem;
+        }
+
+        .preview-card h4 {
+            margin-bottom: 0.5rem;
+            font-size: 1.2rem;
+        }
+
+        .preview-stats {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 0.5rem;
+        }
+
+        .preview-text {
+            font-size: 0.9rem;
+            background-color: rgba(255, 255, 255, 0.1);
+            padding: 0.5rem;
+            border-radius: 4px;
+            margin-bottom: 0.5rem;
+        }
+
+        .preview-footer {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.8rem;
+            opacity: 0.8;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 1rem;
+            margin-top: 2rem;
+        }
+
+        .image-upload {
+            border: 2px dashed #2a4f5f;
+            border-radius: 4px;
+            padding: 2rem;
+            text-align: center;
+            transition: border-color 0.3s;
+            background-color: #0f2329;
+        }
+
+        .image-upload:hover {
+            border-color: #00d4ff;
+        }
+
+        .image-upload input {
+            display: none;
+        }
+
+        .image-upload label {
+            cursor: pointer;
+            color: #b0b0b0;
+        }
+
+        .wireframe-note {
+            margin-top: 2rem;
+            padding: 1rem;
+            background-color: #0f2329;
+            border: 1px solid #2a4f5f;
+            border-radius: 4px;
+            font-size: 0.9rem;
+            color: #b0b0b0;
+        }
+
+        @media (max-width: 768px) {
+            .editor-layout {
+                grid-template-columns: 1fr;
+            }
+            
+            .card-preview {
+                position: static;
+            }
+            
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>Card Data Editor</h1>
+        <div class="nav-links">
+            <a href="card-management.html">Card Management</a>
+            <a href="game-manager.html">Game Manager</a>
+        </div>
+    </div>
+
+    <div class="container">
+        <h1 class="page-title">Edit Card Data</h1>
+        
+        <div class="card-navigation">
+            <button class="nav-button nav-button-prev" id="prevCard">
+                ← Previous Card
+            </button>
+            
+            <div class="card-info">
+                <div class="card-counter">Card 3 of 24</div>
+                <div class="card-set-info">Core Set 2024</div>
+            </div>
+            
+            <button class="nav-button nav-button-next" id="nextCard">
+                Next Card →
+            </button>
+        </div>
+        
+        <div class="editor-layout">
+            <div class="editor-form">
+                <form>
+                    <div class="form-section">
+                        <h3>Basic Information</h3>
+                        <div class="form-group">
+                            <label for="card-name">Card Name</label>
+                            <input type="text" id="card-name" value="Lightning Bolt" required>
+                        </div>
+                        
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="card-type">Card Type</label>
+                                <select id="card-type">
+                                    <option value="creature">Creature</option>
+                                    <option value="spell" selected>Spell</option>
+                                    <option value="artifact">Artifact</option>
+                                    <option value="land">Land</option>
+                                </select>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="card-set">Set</label>
+                                <select id="card-set">
+                                    <option value="core-set" selected>Core Set 2024</option>
+                                    <option value="expansion-1">Expansion Pack 1</option>
+                                    <option value="promo">Promo Cards</option>
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="mana-cost">Mana Cost</label>
+                            <input type="number" id="mana-cost" value="1" min="0">
+                        </div>
+                    </div>
+
+                    <div class="form-section">
+                        <h3>Card Text</h3>
+                        <div class="form-group">
+                            <label for="card-text">Card Text</label>
+                            <textarea id="card-text" placeholder="Enter card ability text...">Deal 3 damage to any target.</textarea>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="flavor-text">Flavor Text</label>
+                            <textarea id="flavor-text" placeholder="Enter flavor text...">The spark that ignites the storm.</textarea>
+                        </div>
+                    </div>
+
+                    <div class="form-section">
+                        <h3>Combat Stats</h3>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="attack">Attack</label>
+                                <input type="number" id="attack" value="" min="0" placeholder="N/A for spells">
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="defense">Defense</label>
+                                <input type="number" id="defense" value="" min="0" placeholder="N/A for spells">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-section">
+                        <h3>Additional Properties</h3>
+                        <div class="form-group">
+                            <label for="rarity">Rarity</label>
+                            <select id="rarity">
+                                <option value="common" selected>Common</option>
+                                <option value="uncommon">Uncommon</option>
+                                <option value="rare">Rare</option>
+                                <option value="mythic">Mythic</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="element">Element</label>
+                            <select id="element">
+                                <option value="fire" selected>Fire</option>
+                                <option value="water">Water</option>
+                                <option value="earth">Earth</option>
+                                <option value="air">Air</option>
+                                <option value="neutral">Neutral</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-section">
+                        <h3>Card Image</h3>
+                        <div class="image-upload">
+                            <input type="file" id="card-image" accept="image/*">
+                            <label for="card-image">
+                                Click to upload card image<br>
+                                <small>Supported formats: JPG, PNG, GIF</small>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="action-buttons">
+                        <button type="submit" class="btn btn-success">Save Changes</button>
+                        <button type="button" class="btn btn-secondary">Cancel</button>
+                        <button type="button" class="btn btn-primary">Save & New</button>
+                    </div>
+                </form>
+            </div>
+
+            <div class="card-preview">
+                <h3 style="color: #ffffff;">Preview</h3>
+                <div class="preview-card">
+                    <h4>Lightning Bolt</h4>
+                    <div class="preview-stats">
+                        <span>Mana: 1</span>
+                        <span>Fire</span>
+                    </div>
+                    <div class="preview-text">
+                        Deal 3 damage to any target.
+                    </div>
+                    <div class="preview-text" style="font-style: italic; opacity: 0.8;">
+                        The spark that ignites the storm.
+                    </div>
+                    <div class="preview-footer">
+                        <span>Spell</span>
+                        <span>Common</span>
+                    </div>
+                </div>
+                
+                <div style="margin-top: 1rem;">
+                    <strong style="color: #ffffff;">Card Details:</strong>
+                    <ul style="margin-top: 0.5rem; padding-left: 1rem; color: #b0b0b0;">
+                        <li>Set: Core Set 2024</li>
+                        <li>Type: Spell</li>
+                        <li>Element: Fire</li>
+                        <li>Rarity: Common</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="wireframe-note">
+            <strong>Wireframe Note:</strong> This page allows editing of all data fields for a card. The form is dynamic and shows different fields based on the card type selected. A live preview shows how the card will appear. Users can navigate between cards using Previous/Next buttons without returning to Card Management. The form adapts to the card type fields configured in the Game Manager.
+        </div>
+
+        <script>
+            // Basic navigation functionality for wireframe demonstration
+            document.addEventListener('DOMContentLoaded', function() {
+                const prevButton = document.getElementById('prevCard');
+                const nextButton = document.getElementById('nextCard');
+                const cardCounter = document.querySelector('.card-counter');
+                
+                let currentCard = 3;
+                const totalCards = 24;
+                
+                function updateNavigation() {
+                    prevButton.disabled = currentCard === 1;
+                    nextButton.disabled = currentCard === totalCards;
+                    cardCounter.textContent = `Card ${currentCard} of ${totalCards}`;
+                }
+                
+                prevButton.addEventListener('click', function() {
+                    if (currentCard > 1) {
+                        currentCard--;
+                        updateNavigation();
+                        // In real implementation, would load previous card data
+                        console.log('Loading previous card:', currentCard);
+                    }
+                });
+                
+                nextButton.addEventListener('click', function() {
+                    if (currentCard < totalCards) {
+                        currentCard++;
+                        updateNavigation();
+                        // In real implementation, would load next card data
+                        console.log('Loading next card:', currentCard);
+                    }
+                });
+                
+                // Initialize navigation state
+                updateNavigation();
+            });
+        </script>
+    </div>
+</body>
+</html>

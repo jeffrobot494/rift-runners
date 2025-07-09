@@ -1,0 +1,462 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Card Management - TCG Card Management System</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #0a1a1f;
+            min-height: 100vh;
+        }
+
+        .header {
+            background-color: #0f2329;
+            color: white;
+            padding: 1rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #2a4f5f;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .nav-links a {
+            color: white;
+            text-decoration: none;
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            transition: background-color 0.3s;
+        }
+
+        .nav-links a:hover {
+            background-color: #1a2d35;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .page-title {
+            margin-bottom: 2rem;
+            color: #ffffff;
+        }
+
+        .controls {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .control-group {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .toggle-switch {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .toggle-switch label {
+            color: #ffffff;
+        }
+
+        .toggle-switch input[type="checkbox"] {
+            width: 50px;
+            height: 25px;
+            appearance: none;
+            background-color: #ccc;
+            border-radius: 25px;
+            position: relative;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .toggle-switch input[type="checkbox"]:checked {
+            background-color: #00d4ff;
+        }
+
+        .toggle-switch input[type="checkbox"]:before {
+            content: '';
+            position: absolute;
+            width: 21px;
+            height: 21px;
+            border-radius: 50%;
+            background-color: white;
+            top: 2px;
+            left: 2px;
+            transition: transform 0.3s;
+        }
+
+        .toggle-switch input[type="checkbox"]:checked:before {
+            transform: translateX(25px);
+        }
+
+        .card-checkbox {
+            width: 18px;
+            height: 18px;
+            accent-color: #00d4ff;
+            cursor: pointer;
+        }
+
+        .btn {
+            padding: 0.5rem 1rem;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: background-color 0.3s;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .btn-primary {
+            background-color: #00d4ff;
+            color: #0a1a1f;
+            font-weight: bold;
+        }
+
+        .btn-primary:hover {
+            background-color: #00b8e6;
+        }
+
+        .btn-secondary {
+            background-color: #2a4f5f;
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background-color: #1a3d4a;
+        }
+
+        .btn-success {
+            background-color: #28a745;
+            color: white;
+        }
+
+        .btn-success:hover {
+            background-color: #218838;
+        }
+
+        .card-list {
+            background: #1a2d35;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+            border: 1px solid #2a4f5f;
+        }
+
+        .card-list-header {
+            background-color: #0f2329;
+            padding: 1rem;
+            border-bottom: 1px solid #2a4f5f;
+            display: grid;
+            grid-template-columns: 40px 60px 1fr 120px 100px 100px 120px;
+            gap: 1rem;
+            font-weight: bold;
+            color: #ffffff;
+        }
+
+        .card-item {
+            padding: 1rem;
+            border-bottom: 1px solid #2a4f5f;
+            display: grid;
+            grid-template-columns: 40px 60px 1fr 120px 100px 100px 120px;
+            gap: 1rem;
+            align-items: center;
+            transition: background-color 0.3s;
+            color: #ffffff;
+        }
+
+        .card-item:hover {
+            background-color: #0f2329;
+        }
+
+        .card-item:last-child {
+            border-bottom: none;
+        }
+
+        .card-item.hidden {
+            opacity: 0.5;
+            background-color: #0f2329;
+        }
+
+        .card-thumbnail {
+            width: 50px;
+            height: 70px;
+            background-color: #2a4f5f;
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.8rem;
+            color: #b0b0b0;
+        }
+
+        .card-name {
+            font-weight: bold;
+            color: #ffffff;
+        }
+
+        .card-type {
+            color: #b0b0b0;
+        }
+
+        .card-set {
+            color: #b0b0b0;
+        }
+
+        .card-status {
+            font-size: 0.9rem;
+        }
+
+        .status-visible {
+            color: #28a745;
+        }
+
+        .status-hidden {
+            color: #dc3545;
+        }
+
+        .card-actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .pagination {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 1rem;
+            margin-top: 2rem;
+        }
+
+        .pagination button {
+            padding: 0.5rem 1rem;
+            border: 1px solid #2a4f5f;
+            background-color: #0f2329;
+            cursor: pointer;
+            border-radius: 4px;
+            color: #ffffff;
+        }
+
+        .pagination button:hover {
+            background-color: #1a2d35;
+        }
+
+        .pagination button.active {
+            background-color: #00d4ff;
+            color: #0a1a1f;
+            border-color: #00d4ff;
+            font-weight: bold;
+        }
+
+        .wireframe-note {
+            margin-top: 2rem;
+            padding: 1rem;
+            background-color: #0f2329;
+            border: 1px solid #2a4f5f;
+            border-radius: 4px;
+            font-size: 0.9rem;
+            color: #b0b0b0;
+        }
+
+        @media (max-width: 768px) {
+            .controls {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            
+            .card-list-header,
+            .card-item {
+                grid-template-columns: 40px 1fr;
+                gap: 0.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>Card Management</h1>
+        <div class="nav-links">
+            <a href="game-manager.html">Game Manager</a>
+            <a href="deckbuilder.html">Deckbuilder</a>
+        </div>
+    </div>
+
+    <div class="container">
+        <h1 class="page-title">Card Management</h1>
+        
+        <div class="controls">
+            <div class="control-group">
+                <div class="toggle-switch">
+                    <label for="show-hidden">Show Hidden Cards</label>
+                    <input type="checkbox" id="show-hidden">
+                </div>
+            </div>
+            
+            <div class="control-group">
+                <a href="card-upload.html" class="btn btn-primary">Upload Cards</a>
+            </div>
+        </div>
+
+        <div class="card-list">
+            <div class="card-list-header">
+                <div>
+                    <input type="checkbox" class="card-checkbox" id="select-all">
+                </div>
+                <div>Image</div>
+                <div>Name</div>
+                <div>Type</div>
+                <div>Set</div>
+                <div>Status</div>
+                <div>Actions</div>
+            </div>
+            
+            <div class="card-item">
+                <div>
+                    <input type="checkbox" class="card-checkbox">
+                </div>
+                <div class="card-thumbnail">IMG</div>
+                <div class="card-name">Lightning Bolt</div>
+                <div class="card-type">Spell</div>
+                <div class="card-set">Core Set</div>
+                <div class="card-status status-visible">Visible</div>
+                <div class="card-actions">
+                    <button class="btn btn-secondary">Edit</button>
+                    <button class="btn btn-secondary">Hide</button>
+                </div>
+            </div>
+            
+            <div class="card-item">
+                <div>
+                    <input type="checkbox" class="card-checkbox">
+                </div>
+                <div class="card-thumbnail">IMG</div>
+                <div class="card-name">Fire Dragon</div>
+                <div class="card-type">Creature</div>
+                <div class="card-set">Core Set</div>
+                <div class="card-status status-visible">Visible</div>
+                <div class="card-actions">
+                    <button class="btn btn-secondary">Edit</button>
+                    <button class="btn btn-secondary">Hide</button>
+                </div>
+            </div>
+            
+            <div class="card-item hidden">
+                <div>
+                    <input type="checkbox" class="card-checkbox">
+                </div>
+                <div class="card-thumbnail">IMG</div>
+                <div class="card-name">Broken Sword</div>
+                <div class="card-type">Artifact</div>
+                <div class="card-set">Expansion 1</div>
+                <div class="card-status status-hidden">Hidden</div>
+                <div class="card-actions">
+                    <button class="btn btn-secondary">Edit</button>
+                    <button class="btn btn-success">Show</button>
+                </div>
+            </div>
+            
+            <div class="card-item">
+                <div>
+                    <input type="checkbox" class="card-checkbox">
+                </div>
+                <div class="card-thumbnail">IMG</div>
+                <div class="card-name">Forest</div>
+                <div class="card-type">Land</div>
+                <div class="card-set">Core Set</div>
+                <div class="card-status status-visible">Visible</div>
+                <div class="card-actions">
+                    <button class="btn btn-secondary">Edit</button>
+                    <button class="btn btn-secondary">Hide</button>
+                </div>
+            </div>
+            
+            <div class="card-item">
+                <div>
+                    <input type="checkbox" class="card-checkbox">
+                </div>
+                <div class="card-thumbnail">IMG</div>
+                <div class="card-name">Healing Potion</div>
+                <div class="card-type">Spell</div>
+                <div class="card-set">Core Set</div>
+                <div class="card-status status-visible">Visible</div>
+                <div class="card-actions">
+                    <button class="btn btn-secondary">Edit</button>
+                    <button class="btn btn-secondary">Hide</button>
+                </div>
+            </div>
+            
+            <div class="card-item">
+                <div>
+                    <input type="checkbox" class="card-checkbox">
+                </div>
+                <div class="card-thumbnail">IMG</div>
+                <div class="card-name">Stone Golem</div>
+                <div class="card-type">Creature</div>
+                <div class="card-set">Expansion 1</div>
+                <div class="card-status status-visible">Visible</div>
+                <div class="card-actions">
+                    <button class="btn btn-secondary">Edit</button>
+                    <button class="btn btn-secondary">Hide</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="pagination">
+            <button>Previous</button>
+            <button class="active">1</button>
+            <button>2</button>
+            <button>3</button>
+            <button>Next</button>
+        </div>
+
+        <div class="wireframe-note">
+            <strong>Wireframe Note:</strong> This page displays all cards in a list format with toggle for showing/hiding cards. Links to Card Upload, Deckbuilder, and Game Manager are provided. Cards can be edited directly or their visibility can be toggled. Individual cards can be selected using checkboxes, and the "select all" checkbox in the header can be used to select/deselect all cards.
+        </div>
+    </div>
+
+    <script>
+        // Handle select all functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            const selectAllCheckbox = document.getElementById('select-all');
+            const cardCheckboxes = document.querySelectorAll('.card-checkbox:not(#select-all)');
+            
+            selectAllCheckbox.addEventListener('change', function() {
+                cardCheckboxes.forEach(checkbox => {
+                    checkbox.checked = selectAllCheckbox.checked;
+                });
+            });
+            
+            // Update select all checkbox when individual checkboxes change
+            cardCheckboxes.forEach(checkbox => {
+                checkbox.addEventListener('change', function() {
+                    const checkedCount = document.querySelectorAll('.card-checkbox:not(#select-all):checked').length;
+                    selectAllCheckbox.checked = checkedCount === cardCheckboxes.length;
+                    selectAllCheckbox.indeterminate = checkedCount > 0 && checkedCount < cardCheckboxes.length;
+                });
+            });
+        });
+    </script>
+</body>
+</html>
